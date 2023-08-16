@@ -99,6 +99,29 @@ return {
       opts.ensure_installed = utils.list_insert_unique(opts.ensure_installed, {
         "node2",
       })
+      opts.handlers = {
+        function(config)
+          -- all sources with no handler get passed here
+
+          -- Keep original functionality
+          require("mason-nvim-dap").default_setup(config)
+        end,
+        node2 = function(config)
+          utils.list_insert_unique(config.configurations, {
+            name = "Node2: Launch TS",
+            type = "node2",
+            request = "launch",
+            program = "${file}",
+            cwd = vim.fn.getcwd(),
+            sourceMaps = true,
+            protocol = "inspector",
+            console = "integratedTerminal",
+            -- preLaunchTask = "tsc",
+            outFiles = { "${workspaceFolder}/dist/**/*.js" },
+          })
+          require("mason-nvim-dap").default_setup(config) -- don't forget this!
+        end,
+      }
     end,
   },
   {
